@@ -1,9 +1,31 @@
 import { initViewer, loadModel } from './viewer.js';
+import { MyDataView } from './dataview.js';
+import {
+    APS_MODEL_DEFAULT_FLOOR_INDEX,
+    DEFAULT_TIMERANGE_START,
+    DEFAULT_TIMERANGE_END
+} from './constants.js';
 
-initViewer(document.getElementById('preview')).then(viewer => {
+initViewer(document.getElementById('preview')).then(async (viewer) => {
     const urn = window.location.hash?.substring(1);
     setupModelSelection(viewer, urn);
     setupModelUpload(viewer);
+
+     // Initialize our data view
+     const dataView = new MyDataView();
+     await dataView.init({ start: DEFAULT_TIMERANGE_START, end: DEFAULT_TIMERANGE_END });
+
+    function onLevelChanged({ target, levelIndex }) {
+        dataView.floor = levelIndex !== undefined ? target.floorData[levelIndex] : null;
+        // extensions.forEach(ext => ext.dataView = dataView);
+    }
+
+    // Configure and activate the levels extension
+    const levelsExt = viewer.getExtension('Autodesk.AEC.LevelsExtension');
+    levelsExt.levelsPanel.setVisible(true);
+    levelsExt.floorSelector.addEventListener(Autodesk.AEC.FloorSelector.SELECTED_FLOOR_CHANGED, onLevelChanged);
+    levelsExt.floorSelector.selectFloor(APS_MODEL_DEFAULT_FLOOR_INDEX, true);
+    adjustPanelStyle(levelsExt.levelsPanel, { left: '10px', top: '10px', width: '300px', height: '300px' });
 });
 
 async function setupModelSelection(viewer, selectedUrn) {

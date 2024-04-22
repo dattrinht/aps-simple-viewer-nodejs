@@ -18,7 +18,7 @@ export function initViewer(container) {
     return new Promise(function (resolve, reject) {
         Autodesk.Viewing.Initializer({ env: 'AutodeskProduction', getAccessToken }, function () {
             const config = {
-                extensions: ['Autodesk.DocumentBrowser']
+                extensions: ['Autodesk.DocumentBrowser', 'Autodesk.AEC.LevelsExtension']
             };
             const viewer = new Autodesk.Viewing.GuiViewer3D(container, config);
             viewer.start();
@@ -39,4 +39,14 @@ export function loadModel(viewer, urn) {
         viewer.setLightPreset(0);
         Autodesk.Viewing.Document.load('urn:' + urn, onDocumentLoadSuccess, onDocumentLoadFailure);
     });
+}
+
+export function adjustPanelStyle(panel, { left, right, top, bottom, width, height }) {
+    const style = panel.container.style;
+    style.setProperty('left', left ? left : 'unset');
+    style.setProperty('right', right ? right : 'unset');
+    style.setProperty('top', top ? top : 'unset');
+    style.setProperty('bottom', bottom ? bottom : 'unset');
+    style.setProperty('width', width ? width : 'unset');
+    style.setProperty('height', height ? height : 'unset');
 }
