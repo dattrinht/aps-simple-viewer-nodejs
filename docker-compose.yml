@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+    bimbim:
+      build: .
+      ports:
+        - 5017:5017
